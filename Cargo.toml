@@ -1,0 +1,38 @@
+[package]
+name = "chainblocks-web3"
+version = "0.1.0"
+authors = ["Giovanni Petrantoni <giovanni@fragcolor.xyz>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "web3"
+crate-type = ["cdylib"]
+
+[dependencies]
+futures = { version = "0.3.5" }
+web3 = { version = "0.16.0", default-features = false, features = ["http-tls", "ws-tls-tokio", "signing"] }
+secp256k1 = { version = "0.20.1" }
+tokio = { version = "1.7.1", features = ["full"] }
+ctor = { git = "https://github.com/chainblocks/rust-ctor", rev = "755fd2eaca76c89f9b66e570128de2f635a87584" }
+ethabi = "14.0.0"
+json = "0.12.4"
+log = "0.4.11"
+env_logger = "0.8.1"
+zeroize = "1.1.1"
+hex = "0.4.2"
+lazy_static = "1.4.0"
+regex = "1.4.1"
+chainblocks = { git = "https://github.com/sinkingsugar/chainblocks.git", features = ["run_bindgen", "dllblock"] }
+compile-time-crc32 = "0.1.2"
+
+# # call_with_confirms hotfix
+# [patch.crates-io]
+# web3 = { git = "https://github.com/chainblocks/rust-web3.git" }
+
+# local overrides, manage/comment out
+[patch."https://github.com/sinkingsugar/chainblocks.git"]
+chainblocks = { path = "../automa/chainblocks/rust" }
+# [patch."https://github.com/sinkingsugar/chainblocks.git"]
+# chainblocks = { path = "/home/chainblocks/repo/rust" }
