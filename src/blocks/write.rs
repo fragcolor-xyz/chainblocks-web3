@@ -320,6 +320,7 @@ impl Block for Write {
     self.cu.from.cleanup();
     self.cu.node = None;
     self.cu.data.contract = None;
+    self.output = Table::new();
   }
 
   fn activate(&mut self, context: &Context, input: &Var) -> Result<Var, &str> {

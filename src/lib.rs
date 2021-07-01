@@ -89,6 +89,7 @@ mod blocks {
   mod read_batch;
   mod sendraw;
   mod storage;
+  mod transaction;
   mod unlock;
   mod waitevent;
   mod write;
@@ -126,6 +127,7 @@ mod blocks {
   use read_batch::ReadBatch;
   use sendraw::SendRaw;
   use storage::Storage;
+  use transaction::Transaction;
   use unlock::Unlock;
   use waitevent::WaitEvent;
   use write::Write;
@@ -219,6 +221,7 @@ mod blocks {
     registerBlock::<Write>();
     registerBlock::<WaitEvent>();
     registerBlock::<Storage>();
+    registerBlock::<Transaction>();
     registerBlock::<Unlock>();
     registerBlock::<GasPrice>();
     registerBlock::<ReadBatch>();

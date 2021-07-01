@@ -39,8 +39,8 @@ pub struct WaitEvent {
   output: Table,
 }
 
-static LOGS_TABLE_TYPES: &'static [Type] = &[common_type::bytes, common_type::bytezs];
-const LOGS_TABLE_KEYS: &[RawString] = &[cbstr!("data"), cbstr!("topics")];
+static LOGS_TABLE_TYPES: &'static [Type] = &[common_type::bytes];
+const LOGS_TABLE_KEYS: &[RawString] = &[cbstr!("data")];
 static LOGS_TABLE_TYPE: Type = Type::table(LOGS_TABLE_KEYS, LOGS_TABLE_TYPES);
 
 lazy_static! {
@@ -148,6 +148,7 @@ impl Block for WaitEvent {
     self.cu.instance.cleanup();
     self.cu.node = None;
     self.cu.data.contract = None;
+    self.output = Table::new();
   }
 
   fn activate(&mut self, context: &Context, input: &Var) -> Result<Var, &str> {
@@ -213,7 +214,9 @@ impl BlockingBlock for WaitEvent {
     // wait for an event
     if let Some(sub) = &mut self.sub {
       let node = Var::get_mut_from_clone(&self.cu.node)?;
-      node.scheduler.block_on(work_async(sub, context, &mut self.output))?;
+      node
+        .scheduler
+        .block_on(work_async(sub, context, &mut self.output))?;
       Ok((&self.output).into())
     } else {
       Err("Subscription was empty")
@@ -239,6 +242,7 @@ async fn work_async<'a>(
       if let Some(data) = opt_data {
         if let Ok(logs) = data {
           output.insert_fast_static(cstr!("data"), logs.data.0.as_slice().into());
+
           if let Some(block_hash) = logs.block_hash {
             output.insert_fast_static(cstr!("block_hash"), block_hash.as_bytes().into());
           }
