@@ -18,6 +18,7 @@ use chainblocks::types::ExposedTypes;
 use chainblocks::types::ParamVar;
 use chainblocks::types::Parameters;
 use chainblocks::types::RawString;
+use chainblocks::types::Seq;
 use chainblocks::types::Table;
 use chainblocks::types::Type;
 use chainblocks::types::Types;
@@ -37,10 +38,11 @@ pub struct WaitEvent {
   event_hash: H256,
   sub: Option<web3::api::SubscriptionStream<web3::transports::WebSocket, web3::types::Log>>,
   output: Table,
+  scratch: Seq,
 }
 
-static LOGS_TABLE_TYPES: &'static [Type] = &[common_type::bytes];
-const LOGS_TABLE_KEYS: &[RawString] = &[cbstr!("data")];
+static LOGS_TABLE_TYPES: &'static [Type] = &[common_type::bytes, common_type::bytezs];
+const LOGS_TABLE_KEYS: &[RawString] = &[cbstr!("data"), cbstr!("topics")];
 static LOGS_TABLE_TYPE: Type = Type::table(LOGS_TABLE_KEYS, LOGS_TABLE_TYPES);
 
 lazy_static! {
@@ -80,6 +82,7 @@ impl Default for WaitEvent {
       event_hash: H256::zero(),
       sub: None,
       output: Table::new(),
+      scratch: Seq::new(),
     }
   }
 }
@@ -214,9 +217,12 @@ impl BlockingBlock for WaitEvent {
     // wait for an event
     if let Some(sub) = &mut self.sub {
       let node = Var::get_mut_from_clone(&self.cu.node)?;
-      node
-        .scheduler
-        .block_on(work_async(sub, context, &mut self.output))?;
+      node.scheduler.block_on(work_async(
+        sub,
+        context,
+        &mut self.output,
+        &mut self.scratch,
+      ))?;
       Ok((&self.output).into())
     } else {
       Err("Subscription was empty")
@@ -228,6 +234,7 @@ async fn work_async<'a>(
   sub: &mut web3::api::SubscriptionStream<web3::transports::WebSocket, web3::types::Log>,
   context: &Context,
   output: &mut Table,
+  scratch: &mut Seq,
 ) -> Result<(), &'a str> {
   loop {
     let fut = sub.next();
@@ -241,8 +248,16 @@ async fn work_async<'a>(
     if let Ok(opt_data) = fut_res {
       if let Some(data) = opt_data {
         if let Ok(logs) = data {
+          // mandatory stuff
           output.insert_fast_static(cstr!("data"), logs.data.0.as_slice().into());
 
+          scratch.clear();
+          for topic in logs.topics {
+            scratch.push(topic.as_bytes().into());
+          }
+          output.insert_fast_static(cstr!("topics"), scratch.as_ref().into());
+
+          // optional stuff
           if let Some(block_hash) = logs.block_hash {
             output.insert_fast_static(cstr!("block_hash"), block_hash.as_bytes().into());
           }
@@ -260,6 +275,9 @@ async fn work_async<'a>(
               cstr!("transaction_index"),
               transaction_index.as_u64().try_into()?,
             );
+          }
+          if let Some(removed) = logs.removed {
+            output.insert_fast_static(cstr!("removed"), removed.into());
           }
           return Ok(());
         } else {
