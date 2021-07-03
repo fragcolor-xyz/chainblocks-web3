@@ -69,10 +69,11 @@
    (Eth.Contract :Contract "0x6b175474e89094c44da98b954eedeac495271d0f"
                  :Abi (slurp "dai.json"))
    (Eth.WaitEvent :Event "Transfer")
+   (Log "Log")
    (Take "transaction_hash")
    (ExpectBytes)
    (Eth.Transaction)
-   (Log)))
+   (Log "Tx")))
 
 ;; (schedule Root ganache)
 ;; (schedule Root test)
