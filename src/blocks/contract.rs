@@ -110,20 +110,20 @@ impl Block for SharedContract {
 
   fn setParam(&mut self, index: i32, value: &Var) {
     match index {
-      0 => self.contract_address.setParam(value),
+      0 => self.contract_address.set_param(value),
       1 => self.abi_json = value.try_into().unwrap_or(CString::new("").unwrap()),
       2 => self.instance_name = value.try_into().unwrap_or(CString::new("").unwrap()),
-      3 => self.node_param.setParam(value),
+      3 => self.node_param.set_param(value),
       _ => unreachable!(),
     }
   }
 
   fn getParam(&mut self, index: i32) -> Var {
     match index {
-      0 => self.contract_address.getParam(),
+      0 => self.contract_address.get_param(),
       1 => self.abi_json.as_ref().into(),
       2 => self.instance_name.as_ref().into(),
-      3 => self.node_param.getParam(),
+      3 => self.node_param.get_param(),
       _ => Var::default(),
     }
   }
@@ -144,16 +144,16 @@ impl Block for SharedContract {
     self.requiring.clear();
     let exp_info = ExposedInfo {
       exposedType: NODE_TYPE,
-      name: self.node_param.getName(),
+      name: self.node_param.get_name(),
       help: cstr!("The required ethereum node to use as gateway.").into(),
       ..ExposedInfo::default()
     };
     self.requiring.push(exp_info);
 
-    if self.contract_address.isVariable() {
+    if self.contract_address.is_variable() {
       let exp_info = ExposedInfo {
         exposedType: common_type::any,
-        name: self.contract_address.getName(),
+        name: self.contract_address.get_name(),
         help: cstr!("The required contract address variable.").into(),
         ..ExposedInfo::default()
       };
@@ -163,7 +163,7 @@ impl Block for SharedContract {
   }
 
   fn warmup(&mut self, context: &Context) -> Result<(), &str> {
-    self.instance.setName(self.instance_name.to_str().unwrap());
+    self.instance.set_name(self.instance_name.to_str().unwrap());
     self.instance.warmup(context);
     self.node_param.warmup(context);
     self.contract_address.warmup(context);

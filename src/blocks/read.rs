@@ -232,9 +232,9 @@ impl Block for Read {
 
   fn setParam(&mut self, index: i32, value: &Var) {
     match index {
-      0 => self.cu.instance.setParam(value),
+      0 => self.cu.instance.set_param(value),
       1 => self.cu.data.method = value.try_into().unwrap_or(CString::new("").unwrap()),
-      2 => self.cu.from.setParam(value),
+      2 => self.cu.from.set_param(value),
       3 => {
         if value.is_none() {
           self.block = None;
@@ -246,16 +246,16 @@ impl Block for Read {
           }
         }
       }
-      4 => self.options.setParam(value),
+      4 => self.options.set_param(value),
       _ => unreachable!(),
     }
   }
 
   fn getParam(&mut self, index: i32) -> Var {
     match index {
-      0 => self.cu.instance.getParam(),
+      0 => self.cu.instance.get_param(),
       1 => self.cu.data.method.as_ref().into(),
-      2 => self.cu.from.getParam(),
+      2 => self.cu.from.get_param(),
       3 => {
         if let Some(blockid) = self.block {
           match blockid {
@@ -269,7 +269,7 @@ impl Block for Read {
           Var::default()
         }
       }
-      4 => self.options.getParam(),
+      4 => self.options.get_param(),
       _ => Var::default(),
     }
   }
@@ -287,7 +287,7 @@ impl Block for Read {
   }
 
   fn warmup(&mut self, context: &Context) -> Result<(), &str> {
-    if !self.cu.instance.isVariable() {
+    if !self.cu.instance.is_variable() {
       return Err("Contract instance is empty or not valid");
     }
 

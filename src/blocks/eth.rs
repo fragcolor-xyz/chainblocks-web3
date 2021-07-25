@@ -112,7 +112,7 @@ impl Block for Eth {
   }
 
   fn warmup(&mut self, context: &Context) -> Result<(), &str> {
-    self.instance.setName(self.instance_name.to_str().unwrap());
+    self.instance.set_name(self.instance_name.to_str().unwrap());
     self.instance.warmup(context);
     Ok(())
   }

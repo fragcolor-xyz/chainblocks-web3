@@ -4,7 +4,6 @@ use crate::blocks::NODE_TYPE;
 use crate::blocks::NODE_VAR;
 use chainblocks::block::Block;
 use chainblocks::cblog;
-use chainblocks::cbstr;
 use chainblocks::core::activate_blocking;
 use chainblocks::core::log;
 use chainblocks::core::BlockingBlock;
@@ -15,7 +14,6 @@ use chainblocks::types::ExposedInfo;
 use chainblocks::types::ExposedTypes;
 use chainblocks::types::ParamVar;
 use chainblocks::types::Parameters;
-use chainblocks::types::RawString;
 use chainblocks::types::Table;
 use chainblocks::types::Type;
 use chainblocks::types::Var;
@@ -26,22 +24,6 @@ use std::time::Duration;
 use tokio::time::timeout;
 use web3::types::TransactionId;
 use web3::types::H256;
-
-static TABLE_TYPES: &'static [Type] = &[
-  common_type::bytes,
-  common_type::bytes,
-  common_type::bytes,
-  common_type::bytes,
-  common_type::bytes,
-];
-const TABLE_KEYS: &[RawString] = &[
-  cbstr!("input"),
-  cbstr!("gas"),
-  cbstr!("gas_price"),
-  cbstr!("value"),
-  cbstr!("nonce"),
-];
-static TABLE_TYPE: Type = Type::table(TABLE_KEYS, TABLE_TYPES);
 
 pub struct Transaction {
   node_param: ParamVar,
@@ -65,7 +47,7 @@ impl Default for Transaction {
 
 lazy_static! {
   static ref INPUT_TYPES: Vec<Type> = vec![common_type::string, common_type::bytes];
-  static ref OUTPUT_TYPES: Vec<Type> = vec![TABLE_TYPE];
+  static ref OUTPUT_TYPES: Vec<Type> = vec![crate::blocks::TX_TABLE_TYPE];
   static ref PARAMETERS: Parameters = vec![(
     cstr!("Node"),
     cstr!("The ethereum node block variable to use."),
@@ -101,14 +83,14 @@ impl Block for Transaction {
 
   fn setParam(&mut self, index: i32, value: &Var) {
     match index {
-      0 => self.node_param.setParam(value),
+      0 => self.node_param.set_param(value),
       _ => unreachable!(),
     }
   }
 
   fn getParam(&mut self, index: i32) -> Var {
     match index {
-      0 => self.node_param.getParam(),
+      0 => self.node_param.get_param(),
       _ => unreachable!(),
     }
   }
@@ -117,7 +99,7 @@ impl Block for Transaction {
     self.requiring.clear();
     let exp_info = ExposedInfo {
       exposedType: NODE_TYPE,
-      name: self.node_param.getName(),
+      name: self.node_param.get_name(),
       help: cstr!("The required ethereum node to use as gateway.").into(),
       ..ExposedInfo::default()
     };
@@ -139,16 +121,6 @@ impl Block for Transaction {
   fn activate(&mut self, context: &Context, input: &Var) -> Result<Var, &str> {
     Ok(activate_blocking(self, context, input))
   }
-}
-
-macro_rules! bytes_to_var {
-  ($output:expr, $val:expr, $bits:expr, $name:expr) => {{
-    if let Some(val) = $val {
-      let bytes: [u8; $bits] = val.into();
-      let bytes = &bytes[..];
-      $output.insert_fast_static(cstr!($name), bytes.into());
-    }
-  }};
 }
 
 impl BlockingBlock for Transaction {

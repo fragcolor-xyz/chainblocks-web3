@@ -77,10 +77,28 @@ mod tests {
   }
 }
 
+macro_rules! bytes_to_var {
+  ($output:expr, $val:expr, $bits:expr, $name:expr) => {{
+    if let Some(val) = $val {
+      let bytes: [u8; $bits] = val.into();
+      let bytes = &bytes[..];
+      $output.insert_fast_static(cstr!($name), bytes.into());
+    }
+  }};
+}
+
+macro_rules! bytes_to_var_no_opt {
+  ($output:expr, $val:expr, $bits:expr, $name:expr) => {{
+    let bytes: [u8; $bits] = $val.into();
+    let bytes = &bytes[..];
+    $output.insert_fast_static(cstr!($name), bytes.into());
+  }};
+}
+
 #[cfg(not(test))]
 mod blocks {
+  mod block;
   mod contract;
-  mod tokens;
   mod currentblock;
   mod estimategas;
   mod eth;
@@ -89,6 +107,7 @@ mod blocks {
   mod read_batch;
   mod sendraw;
   mod storage;
+  mod tokens;
   mod transaction;
   mod unlock;
   mod waitevent;
@@ -102,34 +121,37 @@ mod blocks {
   extern crate web3;
   extern crate zeroize;
 
+  use block::EthBlock;
+  use chainblocks::cbstr;
   use chainblocks::core::init;
   use chainblocks::core::registerBlock;
+  use chainblocks::types::common_type;
   use chainblocks::types::ExposedTypes;
   use chainblocks::types::ParamVar;
+  use chainblocks::types::RawString;
   use chainblocks::types::Type;
   use chainblocks::types::Var;
+  use contract::SharedContract;
+  use currentblock::CurrentBlock;
+  use estimategas::EstimateGas;
+  use eth::Eth;
+  use gasprice::GasPrice;
   use json::JsonValue;
+  use read::Read;
+  use read_batch::ReadBatch;
+  use sendraw::SendRaw;
   use std::convert::TryInto;
   use std::env;
   use std::ffi::CString;
   use std::rc::Rc;
   use std::time::Duration;
-  use tokio::runtime::Runtime;
-  use web3::contract::Contract;
-  use web3::types::Address;
-
-  use currentblock::CurrentBlock;
-  use estimategas::EstimateGas;
-  use contract::SharedContract;
-  use eth::Eth;
-  use gasprice::GasPrice;
-  use read::Read;
-  use read_batch::ReadBatch;
-  use sendraw::SendRaw;
   use storage::Storage;
+  use tokio::runtime::Runtime;
   use transaction::Transaction;
   use unlock::Unlock;
   use waitevent::WaitEvent;
+  use web3::contract::Contract;
+  use web3::types::Address;
   use write::Write;
 
   type Transport =
@@ -153,6 +175,22 @@ mod blocks {
   static CONTRACT_TYPE: Type = Type::object(1936289387, 1702127683);
   static CONTRACT_TYPE_VEC: &'static [Type] = &[CONTRACT_TYPE];
   static CONTRACT_VAR: Type = Type::context_variable(CONTRACT_TYPE_VEC);
+
+  static TABLE_TYPES: &'static [Type] = &[
+    common_type::bytes,
+    common_type::bytes,
+    common_type::bytes,
+    common_type::bytes,
+    common_type::bytes,
+  ];
+  const TABLE_KEYS: &[RawString] = &[
+    cbstr!("input"),
+    cbstr!("gas"),
+    cbstr!("gas_price"),
+    cbstr!("value"),
+    cbstr!("nonce"),
+  ];
+  static TX_TABLE_TYPE: Type = Type::table(TABLE_KEYS, TABLE_TYPES);
 
   struct EthData {
     contract: Option<Rc<Option<ContractData>>>,
@@ -226,5 +264,6 @@ mod blocks {
     registerBlock::<GasPrice>();
     registerBlock::<ReadBatch>();
     registerBlock::<SendRaw>();
+    registerBlock::<EthBlock>();
   }
 }

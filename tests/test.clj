@@ -75,9 +75,14 @@
    (Eth.Transaction)
    (Log "Tx")))
 
+(defchain test-Block
+  (Eth "https://cloudflare-eth.com")
+  1000000 (Eth.Block :Full true) (Log))
+
 ;; (schedule Root ganache)
 ;; (schedule Root test)
-(schedule Root ws-test)
+;; (schedule Root ws-test)
+(schedule Root test-Block)
 (run Root 0.1)
 
 (def test nil)

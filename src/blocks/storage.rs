@@ -115,7 +115,7 @@ impl Block for Storage {
 
   fn setParam(&mut self, index: i32, value: &Var) {
     match index {
-      0 => self.address.setParam(value),
+      0 => self.address.set_param(value),
       1 => self.index = value.try_into().unwrap(),
       2 => {
         if value.is_none() {
@@ -125,14 +125,14 @@ impl Block for Storage {
           self.block = Some(BlockNumber::Number(u.into()));
         }
       }
-      3 => self.node_param.setParam(value),
+      3 => self.node_param.set_param(value),
       _ => unreachable!(),
     }
   }
 
   fn getParam(&mut self, index: i32) -> Var {
     match index {
-      0 => self.address.getParam(),
+      0 => self.address.get_param(),
       1 => self.index.into(),
       2 => {
         if let Some(blk) = self.block {
@@ -144,7 +144,7 @@ impl Block for Storage {
           Var::default()
         }
       }
-      3 => self.node_param.getParam(),
+      3 => self.node_param.get_param(),
       _ => unreachable!(),
     }
   }
@@ -153,7 +153,7 @@ impl Block for Storage {
     self.requiring.clear();
     let exp_info = ExposedInfo {
       exposedType: NODE_TYPE,
-      name: self.node_param.getName(),
+      name: self.node_param.get_name(),
       help: cstr!("The required ethereum node to use as gateway.").into(),
       ..ExposedInfo::default()
     };

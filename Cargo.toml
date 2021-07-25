@@ -19,7 +19,7 @@ ctor = { git = "https://github.com/chainblocks/rust-ctor", rev = "755fd2eaca76c8
 ethabi = "14.0.0"
 json = "0.12.4"
 log = "0.4.11"
-env_logger = "0.8.1"
+env_logger = "0.9.0"
 zeroize = "1.1.1"
 hex = "0.4.2"
 lazy_static = "1.4.0"
@@ -33,6 +33,6 @@ compile-time-crc32 = "0.1.2"
 
 # local overrides, manage/comment out
 [patch."https://github.com/sinkingsugar/chainblocks.git"]
-chainblocks = { path = "../automa/chainblocks/rust" }
+chainblocks = { path = "../chainblocks/rust" }
 # [patch."https://github.com/sinkingsugar/chainblocks.git"]
 # chainblocks = { path = "/home/chainblocks/repo/rust" }

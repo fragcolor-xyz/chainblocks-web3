@@ -113,7 +113,7 @@ impl Block for WaitEvent {
   fn setParam(&mut self, index: i32, value: &Var) {
     match index {
       0 => self.cu.data.method = value.try_into().unwrap_or(CString::new("").unwrap()),
-      1 => self.cu.instance.setParam(value),
+      1 => self.cu.instance.set_param(value),
       _ => unreachable!(),
     }
   }
@@ -121,7 +121,7 @@ impl Block for WaitEvent {
   fn getParam(&mut self, index: i32) -> Var {
     match index {
       0 => self.cu.data.method.as_ref().into(),
-      1 => self.cu.instance.getParam(),
+      1 => self.cu.instance.get_param(),
       _ => Var::default(),
     }
   }
@@ -139,7 +139,7 @@ impl Block for WaitEvent {
   }
 
   fn warmup(&mut self, context: &Context) -> Result<(), &str> {
-    if !self.cu.instance.isVariable() {
+    if !self.cu.instance.is_variable() {
       Err("Contract instance is empty or not valid")
     } else {
       self.cu.instance.warmup(context);

@@ -78,14 +78,14 @@ impl Block for SendRaw {
   }
   fn setParam(&mut self, index: i32, value: &Var) {
     match index {
-      0 => self.node_param.setParam(value),
+      0 => self.node_param.set_param(value),
       _ => unreachable!(),
     }
   }
 
   fn getParam(&mut self, index: i32) -> Var {
     match index {
-      0 => self.node_param.getParam(),
+      0 => self.node_param.get_param(),
       _ => unreachable!(),
     }
   }
@@ -93,7 +93,7 @@ impl Block for SendRaw {
     self.requiring.clear();
     let exp_info = ExposedInfo {
       exposedType: NODE_TYPE,
-      name: self.node_param.getName(),
+      name: self.node_param.get_name(),
       help: cstr!("The required ethereum node to use as gateway.").into(),
       ..ExposedInfo::default()
     };

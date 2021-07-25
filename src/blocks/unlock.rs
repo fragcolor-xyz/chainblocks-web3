@@ -89,16 +89,16 @@ impl Block for Unlock {
   fn setParam(&mut self, index: i32, value: &Var) {
     match index {
       0 => self.address = value.try_into().unwrap(),
-      1 => self.password_param.setParam(value),
-      2 => self.node_param.setParam(value),
+      1 => self.password_param.set_param(value),
+      2 => self.node_param.set_param(value),
       _ => unreachable!(),
     }
   }
   fn getParam(&mut self, index: i32) -> Var {
     match index {
       0 => self.address.as_ref().into(),
-      1 => self.password_param.getParam(),
-      2 => self.node_param.getParam(),
+      1 => self.password_param.get_param(),
+      2 => self.node_param.get_param(),
       _ => unreachable!(),
     }
   }
