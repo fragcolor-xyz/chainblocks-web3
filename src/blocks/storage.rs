@@ -196,10 +196,10 @@ impl BlockingBlock for Storage {
       if let Ok(res) = fut_res {
         match res {
           Ok(value) => {
-            let u: H256 = value.into();
-            let ubits: [u8; 32] = u.into();
-            let sbits = &ubits[..];
-            self.output = sbits.into();
+            let value: H256 = value.into();
+            let value: [u8; 32] = value.into();
+            let value = &value[..];
+            self.output = value.into();
             Ok(self.output.0)
           }
           Err(e) => {

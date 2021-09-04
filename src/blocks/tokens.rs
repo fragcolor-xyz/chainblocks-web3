@@ -159,17 +159,17 @@ pub fn tokens_to_var<'a>(tokens: MyTokens, output: &mut ClonedVar) -> Result<(),
     for token in tokens.0 {
         match token {
             Token::Uint(value) => {
-                let u: U256 = value.into();
-                let ubits: [u8; 32] = u.into();
-                let sbits = &ubits[..];
-                vars.push(sbits.into());
+                let value: U256 = value.into();
+                let value: [u8; 32] = value.into();
+                let value = &value[..];
+                vars.push(value.into());
             }
             Token::Address(value) => {
                 // this is just a H160
-                let h: H160 = value.into();
-                let ubits: [u8; 20] = h.into();
-                let sbits = &ubits[..];
-                vars.push(sbits.into());
+                let value: H160 = value.into();
+                let value: [u8; 20] = value.into();
+                let value = &value[..];
+                vars.push(value.into());
             }
             Token::Array(value) => {
                 let mut subv = ClonedVar(Var::default());
@@ -211,8 +211,8 @@ pub fn gather_inputs<'a>(method: &str, json_abi: &JsonValue) -> Result<Vec<Strin
                     if inputs.is_array() {
                         for input in inputs.members() {
                             let ty = &input["type"];
-                            if let Some(tyname) = ty.as_str() {
-                                res.push(tyname.into());
+                            if let Some(name) = ty.as_str() {
+                                res.push(name.into());
                             }
                         }
                     }
@@ -246,8 +246,8 @@ pub fn hash_event<'a>(event: &str, json_abi: &JsonValue) -> Result<H256, &'a str
                             if i != 0 {
                                 s.push(',');
                             }
-                            if let Some(tyname) = ty.as_str() {
-                                s.push_str(tyname);
+                            if let Some(name) = ty.as_str() {
+                                s.push_str(name);
                             } else {
                                 return Err("Failed to get type's string");
                             }

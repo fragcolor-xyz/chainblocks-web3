@@ -12,7 +12,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 futures = { version = "0.3.5" }
-web3 = { version = "0.16.0", default-features = false, features = ["http-tls", "ws-tls-tokio", "signing"] }
+web3 = { version = "0.17.0", default-features = false, features = ["http-tls", "ws-tls-tokio", "signing"] }
 secp256k1 = { version = "0.20.1" }
 tokio = { version = "1.7.1", features = ["full"] }
 ctor = { git = "https://github.com/chainblocks/rust-ctor", rev = "755fd2eaca76c89f9b66e570128de2f635a87584" }
@@ -32,7 +32,9 @@ compile-time-crc32 = "0.1.2"
 # web3 = { git = "https://github.com/chainblocks/rust-web3.git" }
 
 # local overrides, manage/comment out
+# [patch."https://github.com/sinkingsugar/chainblocks.git"]
+# chainblocks = { path = "../chainblocks/rust" }
 [patch."https://github.com/sinkingsugar/chainblocks.git"]
-chainblocks = { path = "../chainblocks/rust" }
+chainblocks = { path = "../automa/chainblocks/rust" }
 # [patch."https://github.com/sinkingsugar/chainblocks.git"]
 # chainblocks = { path = "/home/chainblocks/repo/rust" }
